@@ -6,6 +6,7 @@ import { inferOpenAiCompatibleBiller, type AdapterExecutionContext, type Adapter
 import {
   asString,
   asNumber,
+  asBoolean,
   asStringArray,
   parseObject,
   buildPaperclipEnv,
@@ -216,11 +217,18 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     const runtimeSessionParams = parseObject(runtime.sessionParams);
     const runtimeSessionId = asString(runtimeSessionParams.sessionId, runtime.sessionId ?? "");
     const runtimeSessionCwd = asString(runtimeSessionParams.cwd, "");
+    const resumeSessions = asBoolean(config.resumeSessions, true);
     const canResumeSession =
+      resumeSessions &&
       runtimeSessionId.length > 0 &&
       (runtimeSessionCwd.length === 0 || path.resolve(runtimeSessionCwd) === path.resolve(cwd));
     const sessionId = canResumeSession ? runtimeSessionId : null;
-    if (runtimeSessionId && !canResumeSession) {
+    if (runtimeSessionId && !resumeSessions) {
+      await onLog(
+        "stdout",
+        `[paperclip] OpenCode saved session "${runtimeSessionId}" will not be resumed because resumeSessions is disabled.\n`,
+      );
+    } else if (runtimeSessionId && !canResumeSession) {
       await onLog(
         "stdout",
         `[paperclip] OpenCode session "${runtimeSessionId}" was saved for cwd "${runtimeSessionCwd}" and will not be resumed in "${cwd}".\n`,

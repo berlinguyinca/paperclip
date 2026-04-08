@@ -50,6 +50,24 @@ export function OpenCodeLocalConfigFields({
         </Field>
       )}
       <ToggleField
+        label="Resume sessions"
+        hint={help.resumeSessions}
+        checked={
+          isCreate
+            ? values!.resumeSessions !== false
+            : eff(
+                "adapterConfig",
+                "resumeSessions",
+                config.resumeSessions !== false,
+              )
+        }
+        onChange={(v) =>
+          isCreate
+            ? set!({ resumeSessions: v })
+            : mark("adapterConfig", "resumeSessions", v)
+        }
+      />
+      <ToggleField
         label="Skip permissions"
         hint={help.dangerouslySkipPermissions}
         checked={

@@ -369,6 +369,7 @@ export interface CreateConfigValues {
   promptTemplate: string;
   model: string;
   thinkingEffort: string;
+  resumeSessions?: boolean;
   chrome: boolean;
   dangerouslySkipPermissions: boolean;
   search: boolean;
