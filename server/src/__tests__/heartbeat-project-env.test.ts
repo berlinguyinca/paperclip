@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { resolveExecutionRunAdapterConfig } from "../services/heartbeat.ts";
+import {
+  resolveExecutionRunAdapterConfig,
+  resolveModelProviderUrlFromEnv,
+} from "../services/heartbeat.ts";
 
 describe("resolveExecutionRunAdapterConfig", () => {
   it("overlays project env on top of agent env and unions secret keys", async () => {
@@ -61,5 +64,27 @@ describe("resolveExecutionRunAdapterConfig", () => {
 
     expect(result.resolvedConfig.env).toEqual({ AGENT_ONLY: "agent-only" });
     expect(resolveEnvBindings).not.toHaveBeenCalled();
+  });
+});
+
+describe("resolveModelProviderUrlFromEnv", () => {
+  it("normalizes explicit provider base URLs", () => {
+    expect(
+      resolveModelProviderUrlFromEnv({
+        OPENAI_BASE_URL: "https://openrouter.ai/api/v1/",
+      }),
+    ).toBe("https://openrouter.ai/api/v1");
+  });
+
+  it("falls back to canonical provider URLs when only auth keys are present", () => {
+    expect(resolveModelProviderUrlFromEnv({ OPENAI_API_KEY: "sk-openai" })).toBe("https://api.openai.com/v1");
+    expect(resolveModelProviderUrlFromEnv({ ANTHROPIC_API_KEY: "sk-ant" })).toBe("https://api.anthropic.com");
+    expect(resolveModelProviderUrlFromEnv({ GOOGLE_API_KEY: "sk-google" })).toBe(
+      "https://generativelanguage.googleapis.com",
+    );
+  });
+
+  it("returns null when no provider URL can be inferred", () => {
+    expect(resolveModelProviderUrlFromEnv({})).toBeNull();
   });
 });
