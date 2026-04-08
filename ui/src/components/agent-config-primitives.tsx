@@ -30,6 +30,7 @@ export const help: Record<string, string> = {
   promptTemplate: "Sent on every heartbeat. Keep this small and dynamic. Use it for current-task framing, not large static instructions. Supports {{ agent.id }}, {{ agent.name }}, {{ agent.role }} and other template variables.",
   model: "Override the default model used by the adapter.",
   thinkingEffort: "Control model reasoning depth. Supported values vary by adapter/model.",
+  resumeSessions: "Reuse the adapter's saved session between heartbeats when supported. Disable this for providers/models that hang or behave badly on resume.",
   chrome: "Enable Claude's Chrome integration by passing --chrome.",
   dangerouslySkipPermissions: "Run unattended by auto-approving adapter permission prompts when supported.",
   dangerouslyBypassSandbox: "Run Codex without sandbox restrictions. Required for filesystem/network access.",
